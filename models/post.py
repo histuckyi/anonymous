@@ -1,11 +1,12 @@
 from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from util.serializer import Serializer
 
 db = SQLAlchemy()
 
 
-class Post(db.Model):
+class Post(db.Model, Serializer):
     __table_name__ = 'post'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -18,4 +19,10 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"<Post('{self.id}', '{self.title}')>"
+
+    def serialize(self):
+        d = Serializer.serialize(self)
+        del d['password']
+        d['created_at'] = d['created_at'].strftime('%Y-%m-%d')
+        return d
 

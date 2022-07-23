@@ -6,6 +6,10 @@ def get_all(model):
     return data
 
 
+def paginate(model, page, size):
+    return model.query.paginate(page=page, per_page=size, error_out=True)
+
+
 def insert(model, **kwargs):
     instance = model(**kwargs)
     db.session.add(instance)

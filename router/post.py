@@ -12,7 +12,10 @@ Post = Namespace("Post")
 class BoardPosts(Resource):
 
     def get(self):
-        return jsonify({"hello": "world"})
+        size = int(request.args.get('size', 10))
+        page = int(request.args.get('page', 3))
+        result = database.paginate(PostModel, page, size)
+        return {"total": result.total, "posts": PostModel.serialize_list(result.items)}
 
     def post(self):
         data = request.get_json()
