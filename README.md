@@ -105,5 +105,9 @@ https://www.docker.com/get-started/
 docker-compose up -d
 ```
 
-   
+```
+Network wanted declared as external, but could not be found. Please create the network manually using `docker network create wanted` and try again.
+
+
+```
  

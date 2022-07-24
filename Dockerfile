@@ -55,7 +55,7 @@ RUN pip install -r ./requirements.txt
 
 COPY . ./
 COPY .env.docker ./.env
-RUN rm -rf ./wanted_backend/logs/*.log
+RUN rm -rf ./wanted-backend/logs/*.log
 
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ./entrypoint.sh

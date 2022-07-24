@@ -1,15 +1,12 @@
-from flask import request, Response
+from flask import request
 from flask_restx import Resource, Namespace
-from flask_sqlalchemy import BaseQuery
 
 from error.exception import BadRequestError
-from models.keyword_notification import KeywordNotification as KeywordNotiModel
-from query import comment_query, keyword_noti_query
-from query import basic_query
 from models.comment import Comment as CommentModel
 from models.post import Post as PostModel
+from query import basic_query
+from query import comment_query
 from service.notification import notify
-from util.keyword_analyzer import KeywordAnalyzer
 
 Comment = Namespace("Comment")
 
@@ -18,28 +15,51 @@ Comment = Namespace("Comment")
 class Comments(Resource):
 
     def get(self, post_id):
-        comments = comment_query.get_filter_by_post_id(post_id)
-        comments = CommentModel.serialize_list(comments)
-        result = {}
-        for comment in comments:
-            if comment['parent_comment_id'] is None:
-                result[comment['id']] = {
-                    'id': comment['id'],
-                    'content': comment['content'],
-                    'created_at': comment['created_at'],
-                    'is_parent': True,
-                    'sub_comments': []
-                }
-            else:
-                result[comment['parent_comment_id']]['sub_comments'].append({
-                    'id': comment['id'],
-                    'content': comment['content'],
-                    'created_at': comment['created_at'],
-                    'parent_comment_id': comment['parent_comment_id'],
+        size = int(request.args.get('size', 10))
+        page = int(request.args.get('page', 1))
+        sub_size = int(request.args.get('sub_size', 10))
+        sub_page = int(request.args.get('sub_page', 1))
+
+        main_comments = comment_query.get_filter_by_post_id(post_id, sub_size, sub_page)
+        result = {
+            "total": main_comments.total,
+            "page": main_comments.page,
+            "per_page": main_comments.per_page,
+            "has_next": main_comments.has_next,
+            "comments": []
+        }
+        for comment in main_comments.items:
+            comment = CommentModel.serialize(comment)
+            parent = {
+                'id': comment['id'],
+                'content': comment['content'],
+                'created_at': comment['created_at'],
+                'is_parent': True
+            }
+
+            sub_comments = comment_query.pagination_by_post_id_and_parent_comment_id(post_id, comment['id'], size,
+                                                                                     page)
+            child = {
+                'total': sub_comments.total,
+                'page': sub_comments.page,
+                'per_page': sub_comments.per_page,
+                'has_next': sub_comments.has_next,
+                'sub_comments' : []
+
+            }
+            for sub_comment in sub_comments.items:
+                sub_comment = CommentModel.serialize(sub_comment)
+                child['sub_comments'].append({
+                    'id': sub_comment['id'],
+                    'content': sub_comment['content'],
+                    'created_at': sub_comment['created_at'],
+                    'parent_comment_id': sub_comment['parent_comment_id'],
                     'is_parent': False
                 }
                 )
-        return list(result.values()), 200
+            parent['child'] = child
+        result['comments'].append(parent)
+        return result, 200
 
     def post(self, post_id):
         data = request.get_json()
@@ -59,4 +79,3 @@ class Comments(Resource):
         # comment 키워드를 추출하고, 키워드를 등록한 유저에게 알람
         notify(content)
         return 201
-

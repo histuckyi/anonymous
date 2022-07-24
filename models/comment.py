@@ -21,5 +21,5 @@ class Comment(db.Model, Serializer):
 
     def serialize(self):
         d = Serializer.serialize(self)
-        d['created_at'] = d['created_at'].strftime('%Y-%m-%d')
+        d['created_at'] = d['created_at'].strftime('%Y-%m-%d %h:%m:%s')
         return d
