@@ -1,11 +1,54 @@
-from flask import request, jsonify
-from flask_restx import Api, Resource, Namespace
+from flask import request, jsonify, Response
+from flask_restx import Resource, Namespace
+
+from models import commentTable
+from models import database
+from models.comment import Comment as CommentModel
+from models.post import Post as PostModel
 
 Comment = Namespace("Comment")
 
 
-@Comment.route('')
+@Comment.route('/<int:post_id>')
 class Comments(Resource):
 
-    def get(self):
-        return jsonify({"hello": "world"})
+    def get(self, post_id):
+        comments = commentTable.getFilter(post_id)
+        comments = CommentModel.serialize_list(comments)
+        result = {}
+        for comment in comments:
+            if comment['parent_comment_id'] is None:
+                result[comment['id']] = {
+                    'id': comment['id'],
+                    'content': comment['content'],
+                    'created_at': comment['created_at'],
+                    'is_parent': True,
+                    'sub_comments': []
+                }
+            else:
+                result[comment['parent_comment_id']]['sub_comments'].append({
+                    'id': comment['id'],
+                    'content': comment['content'],
+                    'created_at': comment['created_at'],
+                    'parent_comment_id': comment['parent_comment_id'],
+                    'is_parent': False
+                }
+                )
+        return list(result.values()), 200
+
+    def post(self, post_id):
+        data = request.get_json()
+        if 'content' not in data:
+            raise BaseException
+
+        content = data['content']
+        parent_comment_id = data['parent_comment_id']
+
+        try:
+            post = database.get(PostModel, post_id)
+            if 'parent_comment_id' in data:
+                parent_comment = database.get(CommentModel, parent_comment_id)
+        except PostModel.DoesNotExist:
+            raise BaseException
+        database.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
+        return Response(status=201)
