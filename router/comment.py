@@ -1,8 +1,8 @@
-from flask import request, jsonify, Response
+from flask import request, Response
 from flask_restx import Resource, Namespace
 
-from models import commentTable
-from models import database
+from query import commentQuery
+from query import basicQuery
 from models.comment import Comment as CommentModel
 from models.post import Post as PostModel
 
@@ -13,7 +13,7 @@ Comment = Namespace("Comment")
 class Comments(Resource):
 
     def get(self, post_id):
-        comments = commentTable.getFilter(post_id)
+        comments = commentQuery.get_filter_by_post_id(post_id)
         comments = CommentModel.serialize_list(comments)
         result = {}
         for comment in comments:
@@ -43,12 +43,11 @@ class Comments(Resource):
 
         content = data['content']
         parent_comment_id = data['parent_comment_id']
-
         try:
-            post = database.get(PostModel, post_id)
+            post = basicQuery.get(PostModel, post_id)
             if 'parent_comment_id' in data:
-                parent_comment = database.get(CommentModel, parent_comment_id)
+                basicQuery.get(CommentModel, parent_comment_id)
         except PostModel.DoesNotExist:
             raise BaseException
-        database.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
+        basicQuery.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
         return Response(status=201)

@@ -1,5 +1,4 @@
-from .comment import Comment
-from .post import db
+from models.post import db
 
 
 def get_all(model):
@@ -15,6 +14,7 @@ def insert(model, **kwargs):
     instance = model(**kwargs)
     db.session.add(instance)
     commit()
+    return instance
 
 
 def get(model, id):

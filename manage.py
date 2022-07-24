@@ -11,7 +11,6 @@ with app.app_context():
     db.create_all()
     db.session.commit()
 
-# api = Api(app)  # Flask 객체에 Api 객체 등록
 
 api = Api(
     app,
@@ -29,4 +28,4 @@ api.add_namespace(Post, '/posts')
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=False, host='0.0.0.0', port=80)
