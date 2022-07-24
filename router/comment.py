@@ -36,7 +36,6 @@ class Comments(Resource):
                 'created_at': comment['created_at'],
                 'is_parent': True
             }
-
             sub_comments = comment_query.pagination_by_post_id_and_parent_comment_id(post_id, comment['id'], size,
                                                                                      page)
             child = {
