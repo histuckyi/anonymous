@@ -33,13 +33,13 @@
   
 
 ## 환경 세팅 방법
-로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행한다.
-(mariadb의 기본 포트는 4100이며, root 계정의 비밀번호는 wanted)
+로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행한다.  
+(mariadb의 기본 포트는 4100이며, root 계정의 비밀번호는 wanted)  
 
 
 #### 1. 로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행
-mariaDB를 설치하고 anonymous를 실행하면 자동으로 테이블 생성합니다.  
-아래의 테이블은 참고용입니다. 
+mariaDB를 설치하고 anonymous를 실행하면 자동으로 테이블 생성합니다.    
+(아래 테이블은 참고용)
 ```
 create table keyword_notification
 (을
