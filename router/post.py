@@ -4,10 +4,11 @@ from flask_restx import Api, Resource, Namespace
 from error import exception
 from error.exception import BaseError
 from models.post import Post as PostModel
-from query import basicQuery, postQuery
+from query import basic_query, post_query
 from sqlalchemy import exc
 
-from util.APIExceptionResponse import ApiExceptionResponse
+from service.notification import notify
+from util.api_exception_response import ApiExceptionResponse
 
 Post = Namespace("Post")
 
@@ -18,23 +19,24 @@ class BoardPosts(Resource):
     def get(self):
         size = int(request.args.get('size', 10))
         page = int(request.args.get('page', 3))
-        result = basicQuery.paginate(PostModel, page, size)
+        result = basic_query.paginate(PostModel, page, size)
         return {"total": result.total, "posts": PostModel.serialize_list(result.items)}
 
     def post(self):
         data = request.get_json()
         name = data['name']
-        if postQuery.existName(name):
+        if post_query.existName(name):
             raise exception.DuplicatedNameError
 
         title = data['title']
         content = data['content']
         password = data['password']
         try:
-            new_post = basicQuery.insert(PostModel, name=name, title=title, content=content, password=password)
+            new_post = basic_query.insert(PostModel, name=name, title=title, content=content, password=password)
         except exc.IntegrityError:
             raise exception.BadRequestError
         result = PostModel.serialize(new_post)
+        notify(content)
         return 200
 
 
@@ -42,17 +44,17 @@ class BoardPosts(Resource):
 class BoardPost(Resource):
 
     def put(self, post_id):
-        post = basicQuery.get(PostModel, id=post_id)
+        post = basic_query.get(PostModel, id=post_id)
         data = request.get_json()
         post.password = data['password']
         post.title = data['title']
-        basicQuery.update(PostModel, post_id, author=data['author'], title=data['title'], content=data['content'])
+        basic_query.update(PostModel, post_id, author=data['author'], title=data['title'], content=data['content'])
 
     def delete(self, post_id):
-        post = basicQuery.get(PostModel, id=post_id)
+        post = basic_query.get(PostModel, id=post_id)
         data = request.get_json()
         post.password = data['password']
-        basicQuery.delete(PostModel, post_id)
+        basic_query.delete(PostModel, post_id)
 
 
 @Post.errorhandler(BaseError)

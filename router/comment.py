@@ -1,10 +1,15 @@
 from flask import request, Response
 from flask_restx import Resource, Namespace
+from flask_sqlalchemy import BaseQuery
 
-from query import commentQuery
-from query import basicQuery
+from error.exception import BadRequestError
+from models.keyword_notification import KeywordNotification as KeywordNotiModel
+from query import comment_query, keyword_noti_query
+from query import basic_query
 from models.comment import Comment as CommentModel
 from models.post import Post as PostModel
+from service.notification import notify
+from util.keyword_analyzer import KeywordAnalyzer
 
 Comment = Namespace("Comment")
 
@@ -13,7 +18,7 @@ Comment = Namespace("Comment")
 class Comments(Resource):
 
     def get(self, post_id):
-        comments = commentQuery.get_filter_by_post_id(post_id)
+        comments = comment_query.get_filter_by_post_id(post_id)
         comments = CommentModel.serialize_list(comments)
         result = {}
         for comment in comments:
@@ -44,10 +49,14 @@ class Comments(Resource):
         content = data['content']
         parent_comment_id = data['parent_comment_id']
         try:
-            post = basicQuery.get(PostModel, post_id)
-            if 'parent_comment_id' in data:
-                basicQuery.get(CommentModel, parent_comment_id)
-        except PostModel.DoesNotExist:
-            raise BaseException
-        basicQuery.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
-        return Response(status=201)
+            basic_query.get(PostModel, post_id)
+            if 'parent_comment_id' in data and data['parent_comment_id']:
+                basic_query.get(CommentModel, parent_comment_id)
+            basic_query.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
+        except Exception as e:
+            print(e)
+            raise BadRequestError
+        # comment 키워드를 추출하고, 키워드를 등록한 유저에게 알람
+        notify(content)
+        return 201
+

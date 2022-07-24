@@ -9,8 +9,7 @@ class Comment(db.Model, Serializer):
 
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'))
-    # commentator = models.ForeignKey(User, on_delete=models.CASCADE)
-    parent_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
+    parent_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=True)
     content = db.Column(db.String(300), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime)
