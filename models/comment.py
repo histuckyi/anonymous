@@ -9,6 +9,7 @@ class Comment(db.Model, Serializer):
 
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'))
+    name = db.Column(db.String(80), unique=True, nullable=False)
     parent_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=True)
     content = db.Column(db.String(300), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -21,5 +22,5 @@ class Comment(db.Model, Serializer):
 
     def serialize(self):
         d = Serializer.serialize(self)
-        d['created_at'] = d['created_at'].strftime('%Y-%m-%d')
+        d['created_at'] = d['created_at'].strftime('%Y-%m-%d %h:%m:%s')
         return d

@@ -5,19 +5,21 @@ services:
     container_name: wanted-mariadb
     image: mariadb:10.2
     restart: unless-stopped
-    command: "--server-id=1 --log_slave_updates=1 --log-bin=mysql-bin --binlog_format=row --binlog_row_image=full --sql_mode=IGNORE_SPACE,STRICT_TRANS_TABLES"
+    command: "--server-id=1 --log_slave_updates=1 --log-bin=mysql-bin --binlog_format=row --binlog_row_image=full --sql_mode=IGNORE_SPACE,STRICT_TRANS_TABLES  --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
     environment:
       MARIADB_DATABASE: 'wanted'
       MARIADB_ROOT_PASSWORD: 'wanted'
     volumes:
       - mariadb-local-volume:/var/lib/mysql
+    expose:
+      - 4100
     ports:
-      - '4100:3306'
-    networks:
-      - wanted
+      - 4100:3306
+#    networks:
+#      - wanted
 
-  wanted_backend:
-    container_name: wanted_backend
+  wanted-backend:
+    container_name: wanted-backend
     restart: always
     build:
       context: .
@@ -31,33 +33,33 @@ services:
       options:
         max-size: "1M"
         max-file: "30"
-    networks:
-      - wanted
-
-  wanted_nginx:
-    container_name: wanted_nginx
-    image : nginx:stable
-    restart: always
-    volumes:
-    - ./anonymous-nginx.conf:/etc/nginx/conf.d/anonymous-nginx.conf
-    ports:
-    - 8080:80
-    command:
-      - /bin/bash
-      - -c
-      - |
-        rm -f /etc/nginx/conf.d/default.conf
-        nginx -g 'daemon off;'
-    depends_on:
-      - wanted_backend
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100k"
-        max-file: "10"
-    networks:
-      - wanted
+#    networks:
+#      - wanted
+#
+#  wanted_nginx:
+#    container_name: wanted_nginx
+#    image : nginx:stable
+#    restart: always
+#    volumes:
+#    - ./anonymous-nginx.conf:/etc/nginx/conf.d/anonymous-nginx.conf
+#    ports:
+#    - 8080:80
+#    command:
+#      - /bin/bash
+#      - -c
+#      - |
+#        rm -f /etc/nginx/conf.d/default.conf
+#        nginx -g 'daemon off;'
+#    depends_on:
+#      - wanted-backend
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "100k"
+#        max-file: "10"
+#    networks:
+#      - wanted
 volumes:
   mariadb-local-volume: {}
-networks:
-  wanted:
+#networks:
+#  wanted:
