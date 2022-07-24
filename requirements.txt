@@ -17,6 +17,7 @@ MarkupSafe==2.1.1
 mysql-connector-python==8.0.29
 permissive-dict==1.0.4
 protobuf==4.21.3
+PyMySQL==1.0.2
 pynori==0.2.4
 pyrsistent==0.18.1
 python-dotenv==0.20.0

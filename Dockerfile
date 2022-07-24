@@ -2,7 +2,6 @@ FROM ubuntu:20.04
 
 MAINTAINER Daim Tak <histuckyi@gmail.com>
 
-
 ARG PYTHON_VERSION_TAG=3.10.5
 ARG LINK_PYTHON_TO_PYTHON3=1
 
@@ -42,9 +41,10 @@ COPY install_python.sh install_python.sh
 RUN bash install_python.sh ${PYTHON_VERSION_TAG} ${LINK_PYTHON_TO_PYTHON3} && \
     rm -r install_python.sh Python-${PYTHON_VERSION_TAG}
 
-#RUN ln -s /usr/bin/python3 /usr/bin/python
-#RUN python -m pip install pip --upgrade
-#RUN python -m pip install wheel setuptools
+RUN curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+RUN sudo apt-get install libmariadb3 -y
+RUN sudo apt-get install libmariadb-dev
+
 
 RUN mkdir /code
 WORKDIR /code
