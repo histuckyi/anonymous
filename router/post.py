@@ -19,7 +19,14 @@ class BoardPosts(Resource):
     def get(self):
         size = int(request.args.get('size', 10))
         page = int(request.args.get('page', 1))
-        result = basic_query.paginate(PostModel, page, size)
+        title = request.args.get('title', None)
+        name = request.args.get('name', None)
+        if title:
+            result = post_query.paginateWithTitle(PostModel, page, size, title)
+        elif name:
+            result = post_query.paginateWithName(PostModel, page, size, name)
+        else:
+            result = basic_query.paginate(PostModel, page, size)
         return {
             "total": result.total,
             "page": result.page,

@@ -12,12 +12,12 @@
   - [x] 게시판은 제목, 내용, 작성자 이름, 비밀번호, 작성일시, 수정일시로 구성되어 있습니다. 
   - [x] 로그인 기능 없이 작성자도 입력 파라미터로 받습니다. 
   - [ ] 게시판은 제목, 작성자로 검색이 가능합니다. 
-  - [ ] 게시글 작성, 수정, 삭제가 가능합니다. 
-  - [ ] 게시글 작성시에는 비밀번호를 입력받고, 수정/삭제시 입력한 비밀번호가 맞는 경우만 가능합니다. 
+  - [x] 게시글 작성, 수정, 삭제가 가능합니다. 
+  - [x] 게시글 작성시에는 비밀번호를 입력받고, 수정/삭제시 입력한 비밀번호가 맞는 경우만 가능합니다. 
   - [x] 게시글에는 댓글을 작성할 수 있습니다. 
-  - [ ] 댓글은 내용, 작성자, 작성일시로 구성되어 있습니다. 
+  - [x] 댓글은 내용, 작성자, 작성일시로 구성되어 있습니다. 
   - [x] 댓글의 댓글까지 작성이 가능합니다. 
-  - [ ] 게시물, 댓글 목록 API는 페이징 기능이 있어야 합니다. 
+  - [x] 게시물, 댓글 목록 API는 페이징 기능이 있어야 합니다. 
 - 키워드 알림 기능 
   - [x] 키워드 알림 테이블은 작성자 이름, 키워드 컬럼을 포함하고 있어야 하고 편의상 작성자는 동명이인이 없다고 가정합니다. 작성자가 등록한 키워드가 포함된 게시글이나 코멘트 등록시 알림을 보내줍니다. 
   - [x] 키워드 등록/삭제 부분은 구현을 안하셔도 됩니다. 
@@ -33,10 +33,8 @@
   
 
 ## 환경 세팅 방법
-환경 세팅 방법은 두가지로 안내합니다.
-1. 로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행한다.
-   (mariadb의 기본 포트는 4100이며, root 계정의 비밀번호는 wanted)
-2. docker-compose를 사용하여 실행한다.
+로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행한다.
+(mariadb의 기본 포트는 4100이며, root 계정의 비밀번호는 wanted)
 
 
 #### 1. 로컬에 직접 mariadb를 설치하고 anonymous 애플리케이션을 실행
@@ -90,24 +88,5 @@ create index parent_comment_id
 
 create index post_id
     on comment (post_id);
-```
-
-
-#### 2. 도커 설치하고 docker-compose 사용하여 실행
-사용하는 운영체제가 macOS이고 처음 docker를 설치하려면 홈페이지를 통해 도커 데스크탑(Docker for Desktop)을 내려받아서 설치하거나 쉡 명령어를 통해 설치가 가능합니다.
-macOS에서는 도커 데스크탑 설치 시 docker-compose를 별도의 설치 없이 사용하실 수 있습니다. 
-1. 공식홈에서 다운로드 후 설치 (사용중인 mac의 CPU 칩에 맞게 다운로)
-https://www.docker.com/get-started/ 
-
-## 테스트
-* 해당 프로젝트는 docker와 docker-compose 실행 환경이 갖춰져 있다면 별도의 세팅 없이 아래의 명령어로 실행할 수 있습니다.
-```
-docker-compose up -d
-```
-
-```
-Network wanted declared as external, but could not be found. Please create the network manually using `docker network create wanted` and try again.
-
-
 ```
  
