@@ -42,7 +42,7 @@ mariaDB를 설치하고 anonymous를 실행하면 자동으로 테이블 생성�
 (아래 테이블은 참고용)
 ```
 create table keyword_notification
-(을
+(
     id         int auto_increment
         primary key,
     keyword    varchar(300) not null,
@@ -71,10 +71,13 @@ create table comment
     id                int auto_increment
         primary key,
     post_id           int          null,
+    name              varchar(80)  not null,
     parent_comment_id int          null,
     content           varchar(300) not null,
     created_at        datetime     not null,
     updated_at        datetime     null,
+    constraint name
+        unique (name),
     constraint comment_ibfk_1
         foreign key (post_id) references post (id)
             on delete cascade,
@@ -88,4 +91,5 @@ create index parent_comment_id
 
 create index post_id
     on comment (post_id);
+
 ```

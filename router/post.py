@@ -9,6 +9,7 @@ from query import basic_query, post_query
 from service.notification import notify
 from util.api_exception_response import ApiExceptionResponse
 from util.password import matches, encryption
+from util.validation import checkKeyInData
 
 Post = Namespace("Post")
 
@@ -78,13 +79,3 @@ class BoardPost(Resource):
 @Post.errorhandler(BaseError)
 def post_error_handler(error):
     return ApiExceptionResponse(error).response()
-
-
-def checkKeyInData(key, data):
-    try:
-        data[key]
-    except Exception as e:
-        raise BadRequestError
-    return data[key]
-
-
