@@ -7,6 +7,7 @@ from models.post import Post as PostModel
 from query import basic_query
 from query import comment_query
 from service.notification import notify
+from util.validation import checkKeyInData
 
 Comment = Namespace("Comment")
 
@@ -65,13 +66,16 @@ class Comments(Resource):
         if 'content' not in data:
             raise BaseException
 
-        content = data['content']
-        parent_comment_id = data['parent_comment_id']
+        content = checkKeyInData('content', data)
+        name = checkKeyInData('name', data)
+
         try:
             basic_query.get(PostModel, post_id)
+            parent_comment_id = None
             if 'parent_comment_id' in data and data['parent_comment_id']:
+                parent_comment_id = data['parent_comment_id']
                 basic_query.get(CommentModel, parent_comment_id)
-            basic_query.insert(CommentModel, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
+            basic_query.insert(CommentModel, name=name, post_id=post_id, content=content, parent_comment_id=parent_comment_id)
         except Exception as e:
             print(e)
             raise BadRequestError
